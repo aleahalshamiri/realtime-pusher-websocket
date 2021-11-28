@@ -19,6 +19,16 @@
                 font-family: 'Nunito', sans-serif;
             }
         </style>
+        
+        <script>
+            window.Laravel = <?php echo json_encode([
+                'csrfToken' => csrf_token(),
+            ]); ?>;
+            var module = { }; /*   <-----THIS LINE */
+        </script>
+        <script>
+            window.PUSHER_KEY = "<?= env('PUSHER_APP_KEY') ?>"
+        </script>
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
@@ -125,8 +135,41 @@
                     <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
                         Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
                     </div>
+
+                    <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
+                        <div id="muath">channel</div>
+                    </div>
                 </div>
             </div>
         </div>
+
+
+
+        <script type="module">
+
+            import Echo from '{{asset('echo.js')}}'
+
+            import {Pusher} from '{{asset('pusher.js')}}'
+
+            window.Pusher = Pusher
+
+            window.Echo = new Echo({
+                broadcaster: 'pusher',
+                key: window.PUSHER_KEY,
+                wsHost: window.location.hostname,
+                wsPort: 6001,
+                forceTLS: false,
+                disableStats: true,
+            });
+
+            window.Echo.channel('aleah-channel')
+            .listen('RealtimeTest', (e) => {
+                    console.log(e);
+                    document.getElementById("muath").innerHTML += "<span>"+e.info+"</span>";
+            })
+
+            console.log("websokets in use")
+
+        </script>
     </body>
 </html>
